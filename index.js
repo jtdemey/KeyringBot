@@ -1,4 +1,5 @@
 const { Client, Intents } = require("discord.js");
+const db = require("./db.js");
 const dotenv = require("dotenv").config();
 const fs = require("fs");
 
@@ -13,6 +14,7 @@ const client = new Client({
   ]
 });
 
+//Gather commands from 'commands' directory
 const commands = {};
 const commandDir = fs
   .readdirSync("./commands")
@@ -23,7 +25,8 @@ for (const file of commandDir) {
 }
 
 client.once("ready", () => {
-  console.log("KeyringBot is active!");
+	db.createTable();
+  console.log("KeyringBot has awoken!");
 });
 
 client.on("messageCreate", async message => {
@@ -37,7 +40,7 @@ client.on("messageCreate", async message => {
     await command(message);
   } catch (err) {
     console.error(err);
-    await interaction.reply(
+    await message.reply(
       `An error occurred during the request: ${err.toString()}`
     );
   }
