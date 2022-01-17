@@ -14,12 +14,11 @@ module.exports = async message => {
 		const conn = db.getNewConnection();
 		const keyringQuery = "SELECT body, last_retrieved, user FROM keyring WHERE user = ?";
 		keyringResult = conn.prepare(keyringQuery).get(keyholder);
-		console.log(keyringResult);
 		conn.close();
 	} catch (err) {
 		console.error(`Error retrieving key: ${err.toString()}`);
 		await message.reply({
-			content: `Sorry, something went wrong; I couldn't find a key for ${userToQuery}.`,
+			content: `Sorry, something went wrong; I couldn't find a key for **${keyholder}**.`,
 			ephemeral: true
 		});
 		return;
@@ -27,7 +26,7 @@ module.exports = async message => {
 
 	if (!keyringResult || !keyringResult.body) {
 		await message.reply({
-			content: `Hmm... I couldn't find a key for ${userToQuery}.`,
+			content: `Hmm... I couldn't find a key for **${keyholder}**.`,
 			ephemeral: true
 		});
 		return;
@@ -38,20 +37,19 @@ module.exports = async message => {
 	try {
 		const conn = db.getNewConnection();
 		const deleteQuery = "DELETE FROM keyring WHERE user = ?";
-		deleteResult = conn.prepare(deleteQuery).get(keyholder);
-		console.log(keyringResult);
+		deleteResult = conn.prepare(deleteQuery).run(keyholder);
 		conn.close();
 	} catch (err) {
 		console.error(`Error deleting key: ${err.toString()}`);
 		await message.reply({
-			content: `Sorry, something went wrong while deleting the key for ${userToQuery}.`,
+			content: `Sorry, something went wrong while deleting the key for **${keyholder}**.`,
 			ephemeral: true
 		});
 		return;
 	}
 
 	await message.reply({
-		content: `I deleted the key for ${userToQuery}.`,
+		content: `I deleted the key for **${keyholder}**.`,
 		ephemeral: true
 	});
 };

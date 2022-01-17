@@ -27,7 +27,7 @@ for (const file of commandDir) {
 
 client.once("ready", () => {
 	db.createTable();
-	disk.initTempDir();
+	disk.createTempDir();
   console.log("KeyringBot has awoken!");
 });
 
@@ -44,7 +44,7 @@ client.on("messageCreate", async message => {
   } catch (err) {
     console.error(err);
     await message.reply(
-      `An error occurred during the request: ${err.toString()}`
+      `An error occurred during the request: ${err}`
     );
   }
 });
