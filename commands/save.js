@@ -1,5 +1,4 @@
 const db = require("../db.js");
-const fs = require("fs");
 const https = require("https");
 const temp = require("temp").track();
 
@@ -10,6 +9,7 @@ const temp = require("temp").track();
  * @returns Promise resolving to file contents as string
  */
 const downloadTextFile = async (hostname, attachmentPath) => {
+  console.log(`downloading file ${attachmentPath}`)
   return new Promise((resolve, reject) => {
     const fileData = [];
     const tempPath = temp.createWriteStream();
@@ -41,11 +41,25 @@ const downloadTextFile = async (hostname, attachmentPath) => {
   });
 };
 
+const sanitizeKey = keyText => {
+  const splitKey = keyText.split()
+};
+
 /**
  * Attempts to save the attached public key in the SQLite database
  * @param {Message} message Discord Message object
  */
 module.exports = async message => {
+	const splitContent = message.content.split(" ");
+	const keyholder = splitContent.length < 2 ? message.author?.username : splitContent[1];
+	if (!keyholder) {
+		await message.reply({
+			content: `Sorry, I couldn't read your username; try specifying your name like "!kbsave KeyringBot"`,
+			ephemeral: true
+		});
+		return;
+	}
+
   //If attachments are present
   if (message && message.attachments) {
     //Too many files
@@ -80,7 +94,6 @@ module.exports = async message => {
 				"INSERT INTO keyring (body, saved_on, user) VALUES (?, ?, ?)"
 			);
 			const currentTime = new Date().toISOString();
-			const keyholder = message.author?.username ?? "unknown";
 			console.log(currentTime, keyholder)
 			const saveKey = conn.transaction(() =>
 				insertSql.run(txtFile, currentTime, keyholder)
@@ -97,7 +110,7 @@ module.exports = async message => {
 		}
 
     await message.reply({
-      content: `Thanks ${keyholder}, I've saved your key.`,
+      content: `Thanks **${keyholder}**, I've saved your key.`,
       ephemeral: true
     });
   }

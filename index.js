@@ -1,5 +1,6 @@
 const { Client, Intents } = require("discord.js");
 const db = require("./db.js");
+const disk = require("./disk.js");
 const dotenv = require("dotenv").config();
 const fs = require("fs");
 
@@ -26,6 +27,7 @@ for (const file of commandDir) {
 
 client.once("ready", () => {
 	db.createTable();
+	disk.initTempDir();
   console.log("KeyringBot has awoken!");
 });
 
@@ -33,7 +35,8 @@ client.on("messageCreate", async message => {
   if (!message || !message.content.startsWith(PREFIX)) return;
 
   const trimmedMessage = message.content.replace(PREFIX, "");
-  const command = commands[trimmedMessage];
+  const invokedCommand = trimmedMessage.split(" ")[0];
+  const command = commands[invokedCommand];
   if (!command) return;
 
   try {

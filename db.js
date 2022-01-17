@@ -8,12 +8,12 @@ module.exports = {
     try {
       const conn = new Database("keyringbot.db");
       const createTableSql = conn.prepare(`CREATE TABLE IF NOT EXISTS keyring(
-				id INT PRIMARY KEY NOT NULL,
+				id INTEGER NOT NULL PRIMARY KEY,
 				body VARCHAR(500000) NOT NULL,
 				last_retrieved DATETIME NULL,
 				saved_on DATETIME NOT NULL,
 				user NVARCHAR(256) NULL
-			)`);
+      )`);
       const createTable = conn.transaction(() => createTableSql.run());
       createTable();
 			conn.close();
