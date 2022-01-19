@@ -1,7 +1,6 @@
 const db = require("../db.js");
+const embeds = require("../embeds.js");
 const { createTempFile } = require("../disk.js");
-const { MessageAttachment } = require("discord.js");
-const temp = require("temp").track();
 
 const DISCORD_CHAR_LIMIT = 2000;
 
@@ -12,9 +11,11 @@ const DISCORD_CHAR_LIMIT = 2000;
 module.exports = async message => {
   const userToQuery = message.content.split(" ")[1];
   if (!userToQuery) {
-    await message.reply({
-      content: `Please specify the user whose key I should find like "*!kbget KeyringBot*".`
-    });
+    await message.channel.send(
+      embeds.createErrorEmbed(
+        `Please specify the user whose key I should find like "*!kbget KeyringBot*".`
+      )
+    );
     return;
   }
 
@@ -28,19 +29,21 @@ module.exports = async message => {
     conn.close();
   } catch (err) {
     console.error(`Error retrieving key: ${err.toString()}`);
-    await message.reply({
-      content: `Sorry, something went wrong; I couldn't find a key for **${userToQuery}**.`,
-      ephemeral: true
-    });
+    await message.channel.send(
+      embeds.createErrorEmbed(
+        `Sorry, something went wrong; I couldn't find a key for **${userToQuery}**.`
+      )
+    );
     return;
   }
 
   //Check for result
   if (!keyringResult || !keyringResult.id || !keyringResult.body) {
-    await message.reply({
-      content: `Hmm... I couldn't find a key for **${userToQuery}**.`,
-      ephemeral: true
-    });
+    await message.channel.send(
+      embeds.createErrorEmbed(
+        `🔎 Hmm... I couldn't find a key for **${userToQuery}**.`
+      )
+    );
     return;
   }
 
@@ -52,18 +55,18 @@ module.exports = async message => {
     conn.close();
   } catch (err) {
     console.error(`Error updating last_retrieved value: ${err.toString()}`);
-    await message.reply({
-      content: `I must have done something wrong; I can't update the record for **${userToQuery}**.`,
-      ephemeral: true
-    });
+    await message.channel.send(
+      embeds.createErrorEmbed(
+        `I must have done something wrong; I can't update the record for **${userToQuery}**.`
+      )
+    );
     return;
   }
 
   //If key doesn't exceed Discord character limit, send as message
   if (keyringResult.body.length < DISCORD_CHAR_LIMIT) {
     await message.reply({
-      content: keyringResult.body,
-      ephemeral: true
+      content: keyringResult.body
     });
     return;
   }
@@ -74,12 +77,12 @@ module.exports = async message => {
     keyringResult.body
   );
   await message.channel.send({
-    content: `Ah, here's the key I have for **${userToQuery}**.`,
+    content: `🔑 Ah, here's the key I have for **${userToQuery}**.`,
     files: [
       {
         attachment: tempFilePath,
         name: `${userToQuery}.asc`,
-        description: `The public encryption key for **${userToQuery}**.`
+        description: `🗝 The public encryption key for **${userToQuery}**.`
       }
     ]
   });

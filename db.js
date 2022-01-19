@@ -16,7 +16,7 @@ module.exports = {
       )`);
       const createTable = conn.transaction(() => createTableSql.run());
       createTable();
-			conn.close();
+      conn.close();
     } catch (err) {
       console.error("Failed to create keyringbot SQL table", err);
     }
@@ -26,6 +26,5 @@ module.exports = {
    * Makes a new connection
    * @returns A new SQLite database connection
    */
-  getNewConnection: () =>
-    new Database("keyringbot.db", { verbose: console.log })
+  getNewConnection: () => new Database("keyringbot.db")
 };

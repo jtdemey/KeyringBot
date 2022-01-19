@@ -1,3 +1,5 @@
+const embeds = require("../embeds.js");
+
 /**
  * Replies with a list of commands and how to use them
  * @param {Message} message Discord Message object
@@ -9,8 +11,10 @@ module.exports = async message => {
 		**!kbhelp**						Displays this message
 		**!kbping**						Replies with "pong!"
 		**!kbsave [keytext]**	Saves your public key so others can request it. If the public key exceeds Discord's 2000 character limit, an attached text file with the ASCII-encoded key is required.`;
-  await message.reply({
-    content: helpText,
-    ephemeral: true
-  });
+	await message.channel.send(
+		embeds.createEmbed(
+			"KeyringBot commands",
+			helpText
+		)
+	);
 };

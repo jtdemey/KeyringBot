@@ -28,13 +28,13 @@ for (const file of commandDir) {
 client.once("ready", () => {
 	db.createTable();
 	disk.createTempDir();
-  console.log("KeyringBot has awoken!");
+  console.log("> 🗿 KeyringBot has awoken!");
 });
 
 client.on("messageCreate", async message => {
   if (!message || !message.content.startsWith(PREFIX)) return;
 
-  const trimmedMessage = message.content.replace(PREFIX, "");
+  const trimmedMessage = message.content.replace(PREFIX, "").trim();
   const invokedCommand = trimmedMessage.split(" ")[0];
   const command = commands[invokedCommand];
   if (!command) return;
@@ -44,7 +44,7 @@ client.on("messageCreate", async message => {
   } catch (err) {
     console.error(err);
     await message.reply(
-      `An error occurred during the request: ${err}`
+      `⚠ An error occurred during the request: ${err}`
     );
   }
 });
